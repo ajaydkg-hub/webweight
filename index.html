@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Filling System</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f9; margin: 0; padding: 20px; }
+    .card { background: white; max-width: 400px; margin: auto; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h2 { color: #333; }
+    .metric { font-size: 38px; font-weight: bold; color: #007bff; margin: 15px 0; }
+    .status { font-size: 18px; color: #28a745; margin-bottom: 20px; font-weight: bold; }
+    input[type=number] { width: 80%; padding: 12px; font-size: 20px; text-align: center; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 12px; }
+    button { background: #28a745; color: white; border: none; padding: 12px 20px; font-size: 18px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
+    button:hover { background: #218838; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Smart Filling Scale</h2>
+    <div>Current Weight:</div>
+    <div class="metric" id="weight">0.000 kg</div>
+    
+    <div class="status" id="status">Servo: IDLE (0°)</div>
+
+    <h3>Set Target Weight (kg)</h3>
+    <input type="number" id="targetInput" step="0.001" value="3.300">
+    <br>
+    <button onclick="updateTarget()">Update Target</button>
+  </div>
+
+  <script>
+    setInterval(fetchData, 1000);
+
+    function fetchData() {
+      fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('weight').innerText = data.weight.toFixed(3) + " kg";
+          document.getElementById('status').innerText = "Servo: " + data.statusText;
+        });
+    }
+
+    function updateTarget() {
+      let val = document.getElementById('targetInput').value;
+      fetch('/setTarget?val=' + val)
+        .then(response => response.text())
+        .then(res => alert("Target Weight updated to: " + val + " kg"));
+    }
+  </script>
+</body>
+</html>
